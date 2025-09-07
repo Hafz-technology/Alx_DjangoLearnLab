@@ -63,6 +63,7 @@ def run_queries():
 
     # Retrieve the librarian for a library (OneToOne)
     try:
+        # "Librarian.objects.get(library="
         library = Library.objects.get(name="City Central Library")
         librarian = library.librarian
         print(f"\nLibrarian for {library.name}: {librarian.name}")
