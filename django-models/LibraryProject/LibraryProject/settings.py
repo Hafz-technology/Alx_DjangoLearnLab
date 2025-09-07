@@ -123,4 +123,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# The URL to redirect to after a successful login.
+LOGIN_REDIRECT_URL = '/'
 
+# The URL to redirect to after a successful logout.
+LOGOUT_REDIRECT_URL = '/'
+
+# The URL where requests will be redirected to if they need to be authenticated.
+LOGIN_URL = 'login'
+
+# With these changes, you can now run your Django development server and test the full authentication flow by navigating to `/register/`, `/login/`, and `/logout/`.

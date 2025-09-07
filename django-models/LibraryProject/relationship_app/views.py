@@ -1,9 +1,28 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import DetailView
-from .models import Book
-from .models import Library
-from django.views.generic.detail import DetailView
-# Create your views here.
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import reverse_lazy
+from .models import Book, Library
+
+# Function-based view for user registration
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'relationship_app/register.html', {'form': form})
+
+# A class-based view for login that uses Django's built-in form
+class CustomLoginView(LoginView):
+    template_name = 'relationship_app/login.html'
+
+# A class-based view for logout that uses Django's built-in functionality
+class CustomLogoutView(LogoutView):
+    template_name = 'relationship_app/logout.html'
 
 # Function-based view to list all books
 def book_list_view(request):
