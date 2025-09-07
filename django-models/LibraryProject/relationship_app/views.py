@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from .models import Book, Library
+from django.contrib.auth import login
 
 # Function-based view for user registration
 def register_view(request):
