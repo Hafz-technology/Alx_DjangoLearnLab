@@ -51,6 +51,7 @@ def run_queries():
     
     # List all books in a library (ManyToMany)
     try:
+        # library = Library.objects.get(name=library_name)
         library = Library.objects.get(name="City Central Library")
         books_in_library = library.books.all()
         print(f"\nBooks in {library.name}:")
