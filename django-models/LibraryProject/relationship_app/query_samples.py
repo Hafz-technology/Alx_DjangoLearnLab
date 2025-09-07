@@ -41,29 +41,29 @@ def run_queries():
 
     # Query all books by a specific author (ForeignKey)
     try:
-        orwell = Author.objects.get(name="George Orwell")
-        books_by_orwell = orwell.book_set.all()
-        print(f"\nBooks by {orwell.name}:")
-        for book in books_by_orwell:
+        author = Author.objects.get(name="George Orwell")
+        books_by_author = author.book_set.all()
+        print(f"\nBooks by {author.name}:")
+        for book in books_by_author:
             print(f"- {book.title}")
     except Author.DoesNotExist:
         print("Author 'George Orwell' not found.")
     
     # List all books in a library (ManyToMany)
     try:
-        city_library = Library.objects.get(name="City Central Library")
-        books_in_city_library = city_library.books.all()
-        print(f"\nBooks in {city_library.name}:")
-        for book in books_in_city_library:
+        library = Library.objects.get(name="City Central Library")
+        books_in_library = library.books.all()
+        print(f"\nBooks in {library.name}:")
+        for book in books_in_library:
             print(f"- {book.title}")
     except Library.DoesNotExist:
         print("Library 'City Central Library' not found.")
 
     # Retrieve the librarian for a library (OneToOne)
     try:
-        city_library = Library.objects.get(name="City Central Library")
-        librarian_for_city_library = city_library.librarian
-        print(f"\nLibrarian for {city_library.name}: {librarian_for_city_library.name}")
+        library = Library.objects.get(name="City Central Library")
+        librarian = library.librarian
+        print(f"\nLibrarian for {library.name}: {librarian.name}")
     except Library.DoesNotExist:
         print("Library 'City Central Library' not found.")
     except Librarian.DoesNotExist:
