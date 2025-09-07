@@ -41,6 +41,7 @@ def run_queries():
 
     # Query all books by a specific author (ForeignKey)
     try:
+        # "Author.objects.get(name=author_name)", "objects.filter(author=author)"
         author = Author.objects.get(name="George Orwell")
         books_by_author = author.book_set.all()
         print(f"\nBooks by {author.name}:")
