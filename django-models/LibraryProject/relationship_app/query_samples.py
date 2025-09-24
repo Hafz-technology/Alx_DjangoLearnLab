@@ -41,7 +41,8 @@ def retrieve_books_by_author():
     library = Library.objects.get(name=library_name)
     
     print(f"Books by {library_name}: {[book.title for book in books_by_author]}") 
-
+    author = "Author One"
+    books = Book.objects.filter(author=author)
 
 
 if __name__ == "__main__":
