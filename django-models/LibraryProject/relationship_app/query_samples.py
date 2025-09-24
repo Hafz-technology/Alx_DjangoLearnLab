@@ -32,10 +32,17 @@ def setup_data():
     
  
 def retrieve_books_by_author():
-    author = Author.objects.get(name="Author One")
+    author_name = "Author One"
+    author = Author.objects.get(name=author_name)
     books_by_author = author.books.all()
     print(f"Books by {author.name}: {[book.title for book in books_by_author]}") 
- 
+    
+    library_name = "Library One"
+    library = Library.objects.get(name=library_name)
+    
+    print(f"Books by {library_name}: {[book.title for book in books_by_author]}") 
+
+
 
 if __name__ == "__main__":
     setup_data()
