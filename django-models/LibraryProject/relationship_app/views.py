@@ -32,10 +32,10 @@ class LibraryDetailView(DetailView):
         return context
 
 
-class Register(CreateView):
+class register(CreateView):
     form_class = UserCreationForm
-    template_name = './templates/relationship_app/register.html'
     success_url = reverse_lazy('login')
+    template_name = './templates/relationship_app/register.html'
 
     def form_valid(self, form):
         response = super().form_valid(form)
