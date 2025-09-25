@@ -32,7 +32,7 @@ class LibraryDetailView(DetailView):
         return context
 
 
-class SignUpView(CreateView):
+class Register(CreateView):
     form_class = UserCreationForm
     template_name = './templates/relationship_app/register.html'
     success_url = reverse_lazy('login')
