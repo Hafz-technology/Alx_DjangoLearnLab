@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from .models import Book
 from .models import Library
 from django.views.generic.detail import DetailView
+from django.contrib.auth import login
+from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm 
 # Create your views here.
 
 def index(request):
@@ -25,5 +28,6 @@ class LibraryDetailView(DetailView):
         # Add the books related to this specific library to the context
         context['books'] = self.object.books.all()
         return context
+
 
 
