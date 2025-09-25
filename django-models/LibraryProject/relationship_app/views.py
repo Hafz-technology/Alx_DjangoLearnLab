@@ -6,6 +6,8 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.forms import UserCreationForm 
+from django.urls import reverse_lazy
+from django.views.generic import CreateView 
 # Create your views here.
 
 def index(request):
@@ -30,4 +32,13 @@ class LibraryDetailView(DetailView):
         return context
 
 
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    template_name = './templates/relationship_app/register.html'
+    success_url = reverse_lazy('login')
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # Log the user in after successful sign-up
+        login(self.request, self.object)
+        return response
