@@ -22,4 +22,7 @@ urlpatterns = [
     path('librarian-panel/', views.librarian_view, name='librarian_panel'),
     path('member-area/', views.member_view, name='member_area'),
     
+    path('books/add/', views.add_book, name='book_add'),
+    path('books/edit/<int:book_id>/', views.edit_book, name='book_edit'),
+    path('books/delete/<int:book_id>/', views.delete_book, name='book_delete'),
 ]
