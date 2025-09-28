@@ -9,12 +9,64 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView 
 
+
 from django.contrib.auth.decorators import user_passes_test
 from .models import UserProfile # Import the UserProfile model
+
+
+from django.contrib.auth.decorators import permission_required
+# Import the Book model if not already imported
+
+
+
 # Create your views here.
+
+@permission_required('relationship_app.can_add_book', login_url='/login/')
+def add_book(request):
+    """View to handle adding a new book, restricted by custom permission."""
+    # In a real app, this would handle a form submission (POST)
+    # and display the form (GET).
+    return HttpResponse(f"<h1>Book Addition Form (Protected)</h1><p>User {request.user.username} has permission to add books.</p>")
+
+# Permission: relationship_app.can_change_book
+@permission_required('relationship_app.can_change_book', login_url='/login/')
+def edit_book(request, book_id):
+    """View to handle editing an existing book, restricted by custom permission."""
+    # In a real app, this would fetch the book by book_id and handle the form.
+    try:
+        book = Book.objects.get(pk=book_id)
+        message = f"Editing Book: '{book.title}'."
+    except Book.DoesNotExist:
+        message = f"Book with ID {book_id} not found."
+        
+    return HttpResponse(f"<h1>Book Edit Form (Protected)</h1><p>User {request.user.username} has permission to change books. {message}</p>")
+
+# Permission: relationship_app.can_delete_book
+@permission_required('relationship_app.can_delete_book', login_url='/login/')
+def delete_book(request, book_id):
+    """View to handle deleting a book, restricted by custom permission."""
+    # In a real app, this would handle a confirmation and deletion.
+    return HttpResponse(f"<h1>Book Deletion Confirmation (Protected)</h1><p>User {request.user.username} has permission to delete books. Attempting to delete book ID: {book_id}.</p>")
+
+
+
+
+
+
+
+
+
 
 def index(request):
     return HttpResponse("Welcome to the Relationship App!")
+
+
+
+
+
+
+
+
 
 
 def list_books(request):
