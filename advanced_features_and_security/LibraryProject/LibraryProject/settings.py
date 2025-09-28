@@ -27,10 +27,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5q0j$1hksio)l%iqa%5m0r&9l$&1^hjzkt9w21@(ig$uh=6&#s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# 1. DEBUG Setting (CRITICAL for production)
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# Replace 'yourdomain.com' with the actual domain(s) of your live server
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost' """ , '.yourdomain.com'"""] 
 
+# Enforce cookies to be sent only over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Prevent client-side JavaScript from accessing session/CSRF cookies
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = True
 
 # Application definition
 
