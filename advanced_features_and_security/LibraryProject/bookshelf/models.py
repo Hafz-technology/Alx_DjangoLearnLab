@@ -58,6 +58,15 @@ class Book(models.Model):
     )
     class Meta:
         # Define the custom permissions here
+        # ----------------------------------------------------------------
+        # PERMISSIONS AND GROUP SETUP DOCUMENTATION
+        # These custom permissions are defined to control access to Book instances.
+        # They are assigned to user groups via the Django Admin:
+        #
+        # - Viewers Group: Only assigned 'bookshelf.can_view'
+        # - Editors Group: Assigned 'bookshelf.can_view', 'bookshelf.can_create', 'bookshelf.can_edit'
+        # - Admins Group: Assigned all permissions.
+        # ----------------------------------------------------------------
         permissions = [
             ("can_view", "Can view book data"),
             ("can_create", "Can create new books"),
