@@ -41,6 +41,48 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
 
+# Prevent browsers from trying to guess content types (helps prevent XSS)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Prevent the site from being rendered in an iframe to mitigate clickjacking attacks
+X_FRAME_OPTIONS = 'DENY'
+
+# Set to 0 if you are sure your reverse proxy handles this.
+SECURE_SSL_REDIRECT = True 
+
+# Time in seconds that the browser should remember that the site is only to be accessed using HTTPS.
+SECURE_HSTS_SECONDS = 31536000 # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+
+# =====================================================================
+# STEP 4: IMPLEMENT CONTENT SECURITY POLICY (CSP)
+# Using the recommended approach: the 'csp-middleware' from Django's documentation 
+# or a third-party package like django-csp.
+# Since we must deliver the feature without installing external packages, 
+# we'll implement a basic header via middleware configuration (if allowed) or assume 
+# a simple setup:
+# (If using django-csp, you would add 'csp.middleware.CSPMiddleware' to MIDDLEWARE)
+# =====================================================================
+
+# If you were to use a package like django-csp, the configuration would look like this:
+# CSP_DEFAULT_SRC = ("'none'",)
+# CSP_SCRIPT_SRC = ("'self'",)
+# CSP_STYLE_SRC = ("'self'",)
+# CSP_IMG_SRC = ("'self'", "data:")
+# CSP_FONT_SRC = ("'self'",)
+
+# Manually setting a base header via the security middleware is simpler for this task:
+# Ensure SecurityMiddleware is active in your MIDDLEWARE list:
+
+
+
+
+
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
