@@ -5,18 +5,25 @@ from .models import Book # Import the Book model
 
 
 
+from django.db.models import Q # Used for complex ORM queries
+
+
+
+
 def index(request):
     return HttpResponse("Welcome to the Bookshelf! Navigation is restricted by permissions.")
 
 @permission_required('bookshelf.can_view', raise_exception=True)
 def book_list(request):
-    """
-    View to list all books. Requires 'bookshelf.can_view'.
-    """
-    books = Book.objects.all()
-    # In a real template, you would render the list here.
+    search_query = request.GET.get('q', '') # Get user input safely, default to empty string
+    if search_query:
+        books = Book.objects.filter(
+            Q(title__icontains=search_query) | Q(author__icontains=search_query)
+        ).order_by('title')
+    else:
+        books = Book.objects.all().order_by('title')
     book_titles = ", ".join([book.title for book in books])
-    return HttpResponse(f"List of Books (View Permission Granted): {book_titles}")
+    return HttpResponse(f"Books matching '{search_query}' (if any): {book_titles}")
 
 
 #

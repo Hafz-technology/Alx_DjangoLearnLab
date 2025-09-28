@@ -55,6 +55,33 @@ SECURE_HSTS_SECONDS = 31536000 # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
+# ----------------------------------------------------------------------------------
+# SECURITY CONFIGURATIONS (Implemented to address common vulnerabilities)
+# ----------------------------------------------------------------------------------
+
+# CRITICAL: Ensures no debug information is leaked in production.
+# DEBUG = False 
+
+# CRITICAL: Prevents HTTP Host header attacks. Must list all valid domain names.
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.yourdomain.com'] 
+
+# CSRF_COOKIE_SECURE and SESSION_COOKIE_SECURE: 
+# Ensure session/CSRF cookies are only transmitted over secure HTTPS connections.
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+
+# X_FRAME_OPTIONS = 'DENY': 
+# Mitigates clickjacking attacks by preventing the site from being embedded in an iframe.
+# X_FRAME_OPTIONS = 'DENY'
+
+# SECURE_CONTENT_TYPE_NOSNIFF = True:
+# Prevents browsers from attempting to 'sniff' the content type (helps prevent XSS).
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+
+
+
+
+
 # SECURE_BROWSER_XSS_FILTER
 
 # =====================================================================
