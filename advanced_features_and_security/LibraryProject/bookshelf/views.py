@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404 , redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import permission_required
 from .models import Book # Import the Book model
@@ -6,6 +6,7 @@ from .models import Book # Import the Book model
 
 
 from django.db.models import Q # Used for complex ORM queries
+from .forms import BookForm
 
 
 
@@ -30,12 +31,19 @@ def book_list(request):
 @permission_required('bookshelf.can_create', raise_exception=True)
 def book_create(request):
     """
-    View to handle creating a new book. Requires 'bookshelf.can_create'.
+    View to handle creating a new book, using BookForm for safety and validation.
     """
     if request.method == 'POST':
-        # Logic to create a new book
-        return HttpResponse("Book Created Successfully (Create Permission Granted).")
-    return HttpResponse("Book Create Form (Create Permission Check Passed).")
+        form = BookForm(request.POST)
+        if form.is_valid():
+            # Data is clean and safe, the ORM handles SQL injection prevention
+            form.save() 
+            return redirect('book_list') # Redirect to the book list view
+    else:
+        form = BookForm()
+        
+    # Render a template (you'd need to create one like book_form.html)
+    return render(request, 'bookshelf/book_form.html', {'form': form})
 
 
 
