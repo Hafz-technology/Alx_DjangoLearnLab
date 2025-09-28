@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings 
 
 # Create your models here.
 
@@ -54,7 +55,11 @@ class UserProfile(models.Model):
     ]
 
     # Link to the built-in User model
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,  # Use this constant instead of 'auth.User'
+        on_delete=models.CASCADE
+    ) 
+    # user = models.OneToOneField(User, on_delete=models.CASCADE)
     # Role field with choices, default to Member
     role = models.CharField(
         max_length=10,

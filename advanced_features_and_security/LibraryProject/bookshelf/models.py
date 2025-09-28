@@ -56,6 +56,17 @@ class Book(models.Model):
         related_name='books_owned',
         null=True # Example
     )
+    class Meta:
+        # Define the custom permissions here
+        permissions = [
+            ("can_view", "Can view book data"),
+            ("can_create", "Can create new books"),
+            ("can_edit", "Can edit existing books"),
+            ("can_delete", "Can delete books"),
+        ]
+
+    def __str__(self):
+        return self.title
 
 
 
