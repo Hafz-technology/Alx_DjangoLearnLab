@@ -8,6 +8,9 @@ from django.contrib.auth import logout
 from django.contrib.auth.forms import UserCreationForm 
 from django.urls import reverse_lazy
 from django.views.generic import CreateView 
+
+from django.contrib.auth.decorators import user_passes_test
+from .models import UserProfile # Import the UserProfile model
 # Create your views here.
 
 def index(request):
@@ -42,3 +45,36 @@ class register(CreateView):
         # Log the user in after successful sign-up
         login(self.request, self.object)
         return response
+
+
+# --- Role-Checking Helpers ---
+
+def is_admin(user):
+    """Check if the user has the 'Admin' role."""
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == UserProfile.ADMIN
+
+def is_librarian(user):
+    """Check if the user has the 'Librarian' role."""
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == UserProfile.LIBRARIAN
+
+def is_member(user):
+    """Check if the user has the 'Member' role."""
+    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == UserProfile.MEMBER
+
+# --- Role-Based Views ---
+
+@user_passes_test(is_admin, login_url='/login/') # Redirects to /login/ if test fails
+def admin_view(request):
+    """View accessible only to Admin users."""
+    return render(request, './templates/relationship_app/admin_view.html', {'role': 'Admin'})
+
+@user_passes_test(is_librarian, login_url='/login/')
+def librarian_view(request):
+    """View accessible only to Librarian users."""
+    return render(request, './templates/relationship_app/librarian_view.html', {'role': 'Librarian'})
+
+@user_passes_test(is_member, login_url='/login/')
+def member_view(request):
+    """View accessible only to Member users."""
+    return render(request, './templates/relationship_app/member_view.html', {'role': 'Member'})
+
