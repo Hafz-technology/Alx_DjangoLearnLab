@@ -1,7 +1,8 @@
 import json
 from datetime import date
 from django.urls import reverse
-from rest_framework.test import APITestCase, APIClient # Swapped TestCase for APITestCase
+from rest_framework.test import APITestCase, APIClient
+from rest_framework import status # Added import for status codes
 from django.contrib.auth.models import User
 from .models import Author, Book 
 
@@ -70,27 +71,27 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     def test_list_access_unauthenticated(self):
         """Test unauthenticated user can list books (IsAuthenticatedOrReadOnly)"""
         res = self.client.get(LIST_URL)
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_detail_access_unauthenticated(self):
         """Test unauthenticated user can retrieve book details (IsAuthenticatedOrReadOnly)"""
         res = self.client.get(detail_url(self.book1.id))
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_create_requires_authentication(self):
         """Test POST /create/ requires authentication (IsAuthenticated)"""
         res = self.client.post(CREATE_URL, self.payload)
-        self.assertEqual(res.status_code, 401) # Unauthorized
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED) # Unauthorized
 
     def test_update_requires_authentication(self):
         """Test PUT /update/ requires authentication (IsAuthenticated)"""
         res = self.client.put(update_url(self.book1.id), {'title': 'New Title', 'author': self.author_tolkien.id})
-        self.assertEqual(res.status_code, 401) 
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED) 
 
     def test_delete_requires_authentication(self):
         """Test DELETE /delete/ requires authentication (IsAuthenticated)"""
         res = self.client.delete(delete_url(self.book1.id))
-        self.assertEqual(res.status_code, 401) 
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED) 
         # Verify book is not deleted
         self.assertTrue(Book.objects.filter(id=self.book1.id).exists())
 
@@ -100,7 +101,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     def test_create_book_success(self):
         """Test authenticated user can create a book successfully (POST)"""
         res = self.auth_client.post(CREATE_URL, self.payload, format='json')
-        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         
         new_book = Book.objects.get(id=res.data['id'])
         self.assertEqual(new_book.title, self.payload['title'])
@@ -109,7 +110,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     def test_retrieve_book_detail(self):
         """Test retrieving a book by ID (GET)"""
         res = self.client.get(detail_url(self.book2.id))
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data['title'], self.book2.title)
 
     def test_update_book_partial(self):
@@ -117,7 +118,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
         new_title = 'The Fellowship of the Ring'
         payload = {'title': new_title}
         res = self.auth_client.patch(update_url(self.book1.id), payload, format='json')
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         self.book1.refresh_from_db()
         self.assertEqual(self.book1.title, new_title)
@@ -126,7 +127,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
         """Test authenticated user can delete a book successfully (DELETE)"""
         book_id = self.book3.id
         res = self.auth_client.delete(delete_url(book_id))
-        self.assertEqual(res.status_code, 204) # No Content
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT) # No Content
         
         self.assertFalse(Book.objects.filter(id=book_id).exists())
 
@@ -140,7 +141,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
             'author': self.author_tolkien.id
         }
         res = self.auth_client.post(CREATE_URL, payload, format='json')
-        self.assertEqual(res.status_code, 400) # Bad Request
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST) # Bad Request
         self.assertIn('publication_year', res.data)
         self.assertIn('Publication year cannot be in the future.', str(res.data['publication_year']))
 
@@ -151,7 +152,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
         """Test filtering by exact publication_year (DjangoFilterBackend)"""
         # Filter for 1937
         res = self.client.get(LIST_URL, {'publication_year': 1937})
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['title'], 'The Hobbit')
 
@@ -159,7 +160,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
         """Test searching by partial title match (SearchFilter)"""
         # Search for 'Two' (should match 'The Two Towers')
         res = self.client.get(LIST_URL, {'search': 'Two'})
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['title'], 'The Two Towers')
 
@@ -168,7 +169,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
         # Search for Author ID (assuming search_fields = ['author'])
         # Since the search field is 'author' (which is the FK ID), we search by ID string
         res = self.client.get(LIST_URL, {'search': str(self.author_martin.id)})
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         # Should match only 'A Game of Thrones'
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['title'], 'A Game of Thrones')
@@ -176,7 +177,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     def test_ordering_by_title_ascending(self):
         """Test ordering by title ascending (OrderingFilter)"""
         res = self.client.get(LIST_URL, {'ordering': 'title'})
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         # Check order: A Game of Thrones, The Hobbit, The Two Towers
         self.assertEqual(res.data[0]['title'], 'A Game of Thrones')
         self.assertEqual(res.data[-1]['title'], 'The Two Towers') # Last element
@@ -184,7 +185,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     def test_ordering_by_year_descending(self):
         """Test ordering by publication_year descending (OrderingFilter)"""
         res = self.client.get(LIST_URL, {'ordering': '-publication_year'})
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         # Check order: 1996, 1954, 1937
         self.assertEqual(res.data[0]['publication_year'], 1996) # A Game of Thrones
         self.assertEqual(res.data[-1]['publication_year'], 1937) # The Hobbit
