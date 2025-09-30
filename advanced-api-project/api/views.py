@@ -3,10 +3,12 @@ from rest_framework import generics
 from .models import Book, Author  # Import Book model
 from .serializers import BookSerializer, AuthorSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import filters 
+from django_filters.rest_framework import DjangoFilterBackend
+
+
 # Create your views here.
-
-
-    
+  
 class BookListView(generics.ListAPIView):
     """
     Handles: GET /api/books/list/
@@ -17,6 +19,18 @@ class BookListView(generics.ListAPIView):
     # Defines the data transformation/validation class
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly] 
+    # Define Filter Backends: Use both DjangoFilterBackend and SearchFilter
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    
+    # Filtering fields (for DjangoFilterBackend): Allows filtering by specific values
+    filterset_fields = ['title', 'author','publication_year'] 
+    
+    # Search fields (for SearchFilter): Allows searching by substring/partial match
+    # 'author__name' allows searching across the ForeignKey relationship.
+    search_fields = ['title', 'author','publication_year']     
+
+
+
 
 
 class BookDetailView(generics.RetrieveAPIView):
