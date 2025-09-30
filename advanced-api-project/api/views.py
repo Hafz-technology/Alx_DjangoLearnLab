@@ -21,7 +21,7 @@ class BookListView(generics.ListAPIView):
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly] 
     # Define Filter Backends: Use both DjangoFilterBackend and SearchFilter
-    filter_backends = [rest_framework.DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     # Filtering fields (for DjangoFilterBackend): Allows filtering by specific values
     filterset_fields = ['title', 'author','publication_year'] 
@@ -29,7 +29,11 @@ class BookListView(generics.ListAPIView):
     # Search fields (for SearchFilter): Allows searching by substring/partial match
     # 'author__name' allows searching across the ForeignKey relationship.
     search_fields = ['title', 'author','publication_year']     
-
+    # Ordering fields (for OrderingFilter): Defines which fields users can sort by
+    # 'author' allows sorting based on the author's name.
+    ordering_fields = ['title', 'author','publication_year']
+    # Optional: Set a default ordering if no ordering is provided by the user
+    ordering = ['title']
 
 
 
