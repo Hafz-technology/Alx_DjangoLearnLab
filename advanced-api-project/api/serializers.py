@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import Author, Book
 from datetime import date
 
-
+# Serializer for the Book model.
+# It includes custom validation to ensure data integrity.
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
@@ -16,6 +17,8 @@ class BookSerializer(serializers.ModelSerializer):
         return value
 
 
+# Serializer for the Author model.
+# This serializer demonstrates a key feature of DRF: handling nested relationships.
 class AuthorSerializer(serializers.ModelSerializer):
     books = BookSerializer(many=True, read_only=True)
     class Meta:

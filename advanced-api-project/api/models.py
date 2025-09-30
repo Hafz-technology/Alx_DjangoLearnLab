@@ -12,6 +12,9 @@ from django.db import models
 # author: a foreign key linking to the Author model, establishing a one-to-many relationship from Author to Books.
 
 
+
+# Model to represent an Author.
+# This is the 'one' side of the one-to-many relationship.
 class Author(models.Model):
     name = models.CharField(max_length=100)
 
@@ -19,10 +22,16 @@ class Author(models.Model):
         return self.name
 
 
+# Model to represent a Book.
+# This is the 'many' side of the one-to-many relationship, linking back to Author.
 class Book(models.Model):
     title = models.CharField(max_length=255)
     publication_year = models.IntegerField()
     
+    # Foreign Key relationship: establishes a one-to-many link to the Author model.
+    # on_delete=models.CASCADE ensures that if an Author is deleted, all their Books are also deleted.
+    # related_name='books' is crucial for the AuthorSerializer, allowing us to access all 
+    # books for an author via author_instance.books.all().
     author = models.ForeignKey(
         Author, 
         on_delete=models.CASCADE, 
