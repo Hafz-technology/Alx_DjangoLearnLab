@@ -28,15 +28,14 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     """
 
     def setUp(self):
-        # 1. Clients
-        # self.client is automatically provided by APITestCase for unauthenticated requests.
-        self.auth_client = APIClient()
-        
-        # 2. Authenticated User
-        self.user = User.objects.create_user(username='tester', password='testpassword')
-        self.auth_client.force_authenticate(user=self.user)
+        # 1. Authenticated User setup using self.client.login()
+        # self.client is automatically provided by APITestCase.
+        self.username = 'tester'
+        self.password = 'testpassword'
+        self.user = User.objects.create_user(username=self.username, password=self.password)
+        # We will use self.client for both authenticated (after login) and unauthenticated requests.
 
-        # 3. Test Data
+        # 2. Test Data
         self.author_tolkien = Author.objects.create(name='J.R.R. Tolkien')
         self.author_martin = Author.objects.create(name='George R.R. Martin')
         
@@ -80,6 +79,7 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
 
     def test_create_requires_authentication(self):
         """Test POST /create/ requires authentication (IsAuthenticated)"""
+        # Test client is unauthenticated by default
         res = self.client.post(CREATE_URL, self.payload)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED) # Unauthorized
 
@@ -100,13 +100,19 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
 
     def test_create_book_success(self):
         """Test authenticated user can create a book successfully (POST)"""
-        response = self.auth_client.post(CREATE_URL, self.payload, format='json')
+        # Log in the test user
+        self.client.login(username=self.username, password=self.password)
+        
+        response = self.client.post(CREATE_URL, self.payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
         # Accessing response.data using res.data (preferred in APITestCase)
         new_book = Book.objects.get(id=response.data['id'])
         self.assertEqual(new_book.title, self.payload['title'])
         self.assertEqual(new_book.publication_year, self.payload['publication_year'])
+        
+        # Optional: Log out after test, though setUp ensures a fresh client for the next test
+        self.client.logout()
 
     def test_retrieve_book_detail(self):
         """Test retrieving a book by ID (GET)"""
@@ -116,35 +122,50 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
 
     def test_update_book_partial(self):
         """Test updating a book's title (PATCH)"""
+        # Log in the test user
+        self.client.login(username=self.username, password=self.password)
+
         new_title = 'The Fellowship of the Ring'
         payload = {'title': new_title}
-        res = self.auth_client.patch(update_url(self.book1.id), payload, format='json')
+        res = self.client.patch(update_url(self.book1.id), payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         self.book1.refresh_from_db()
         self.assertEqual(self.book1.title, new_title)
+        
+        self.client.logout()
 
     def test_delete_book_success(self):
         """Test authenticated user can delete a book successfully (DELETE)"""
+        # Log in the test user
+        self.client.login(username=self.username, password=self.password)
+
         book_id = self.book3.id
-        res = self.auth_client.delete(delete_url(book_id))
+        res = self.client.delete(delete_url(book_id))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT) # No Content
         
         self.assertFalse(Book.objects.filter(id=book_id).exists())
+        
+        self.client.logout()
 
     # --- CUSTOM VALIDATION TEST (Assuming validation is in BookSerializer) ---
     def test_publication_year_validation(self):
         """Test creation fails if publication_year is in the future"""
+        # Log in the test user
+        self.client.login(username=self.username, password=self.password)
+
         future_year = date.today().year + 1
         payload = {
             'title': 'Future Book',
             'publication_year': future_year,
             'author': self.author_tolkien.id
         }
-        res = self.auth_client.post(CREATE_URL, payload, format='json')
+        res = self.client.post(CREATE_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST) # Bad Request
         self.assertIn('publication_year', res.data)
         self.assertIn('Publication year cannot be in the future.', str(res.data['publication_year']))
+        
+        self.client.logout()
 
 
     # --- FILTERING, SEARCHING, and ORDERING TESTS ---
