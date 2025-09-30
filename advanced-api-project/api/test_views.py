@@ -1,8 +1,7 @@
 import json
 from datetime import date
 from django.urls import reverse
-from django.test import TestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase, APIClient # Swapped TestCase for APITestCase
 from django.contrib.auth.models import User
 from .models import Author, Book 
 
@@ -21,7 +20,7 @@ def delete_url(pk):
     return reverse('book-delete', kwargs={'pk': pk})
 
 
-class BookApiTests(TestCase):
+class BookApiTests(APITestCase): # Changed inheritance to APITestCase
     """
     Test suite for the Book CRUD API endpoints.
     Focuses on permission checks, data integrity, and filter/search/ordering functionality.
@@ -29,7 +28,7 @@ class BookApiTests(TestCase):
 
     def setUp(self):
         # 1. Clients
-        self.client = APIClient()
+        # self.client is automatically provided by APITestCase for unauthenticated requests.
         self.auth_client = APIClient()
         
         # 2. Authenticated User
