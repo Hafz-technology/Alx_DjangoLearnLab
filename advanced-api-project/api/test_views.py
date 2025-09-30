@@ -100,10 +100,11 @@ class BookApiTests(APITestCase): # Changed inheritance to APITestCase
 
     def test_create_book_success(self):
         """Test authenticated user can create a book successfully (POST)"""
-        res = self.auth_client.post(CREATE_URL, self.payload, format='json')
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        response = self.auth_client.post(CREATE_URL, self.payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
-        new_book = Book.objects.get(id=res.data['id'])
+        # Accessing response.data using res.data (preferred in APITestCase)
+        new_book = Book.objects.get(id=response.data['id'])
         self.assertEqual(new_book.title, self.payload['title'])
         self.assertEqual(new_book.publication_year, self.payload['publication_year'])
 
