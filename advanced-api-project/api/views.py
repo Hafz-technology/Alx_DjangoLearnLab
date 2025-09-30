@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from .models import Book, Author  # Import Book model
 from .serializers import BookSerializer, AuthorSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny 
 # Create your views here.
 
 
@@ -15,6 +16,7 @@ class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     # Defines the data transformation/validation class
     serializer_class = BookSerializer
+    permission_classes = [AllowAny] 
 
 
 class BookDetailView(generics.RetrieveAPIView):
@@ -24,6 +26,7 @@ class BookDetailView(generics.RetrieveAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [AllowAny]
 
 
 class BookCreateView(generics.CreateAPIView):
@@ -33,7 +36,7 @@ class BookCreateView(generics.CreateAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-
+    permission_classes = [IsAuthenticated] 
 
 class BookUpdateView(generics.UpdateAPIView):
     """
@@ -42,7 +45,7 @@ class BookUpdateView(generics.UpdateAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-
+    permission_classes = [IsAuthenticated] 
 
 class BookDeleteView(generics.DestroyAPIView):
     """
@@ -51,7 +54,7 @@ class BookDeleteView(generics.DestroyAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    
+    permission_classes = [IsAuthenticated] 
     
     
     
