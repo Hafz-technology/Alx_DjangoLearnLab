@@ -1,32 +1,76 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}{{ post.title }}{% endblock %}
-
+{% extends "blog/base.html" %}
 {% block content %}
-    <article class="post-detail">
-        <h1>{{ post.title }}</h1>
-        <div class="post-meta">
-            Posted by <span class="author-name">{{ post.author.username }}</span> 
-            on {{ post.published_date|date:"F j, Y, P" }}
+
+<div class="container mx-auto p-4 max-w-4xl">
+    <!-- Post Content Card -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8 border border-gray-200">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-2">{{ post.title }}</h1>
+        <p class="text-sm text-gray-500 mb-4">
+            By <span class="font-semibold text-blue-600">{{ post.author.username }}</span> 
+            on {{ post.published_date|date:"F d, Y" }}
+        </p>
+        
+        <div class="prose max-w-none mb-6">
+            <p class="text-gray-700 leading-relaxed">{{ post.content|linebreaksbr }}</p>
         </div>
         
-        <!-- Action buttons visible only to the author (the currently logged-in user) -->
-        {% if user.is_authenticated and user.id == post.author.id %}
-            <div class="post-actions">
-                <a href="{% url 'post-update' pk=post.pk %}" class="btn-secondary">Edit Post</a>
-                <a href="{% url 'post-delete' pk=post.pk %}" class="btn-danger">Delete Post</a>
+        <!-- Post Actions -->
+        {% if post.author == user %}
+            <div class="flex space-x-4 mt-4 pt-4 border-t border-gray-100">
+                <a href="{% url 'post-update' pk=post.pk %}" class="text-blue-500 hover:text-blue-700 font-medium">Edit Post</a>
+                <a href="{% url 'post-delete' pk=post.pk %}" class="text-red-500 hover:text-red-700 font-medium">Delete Post</a>
             </div>
         {% endif %}
+    </div>
 
-        <div class="post-content">
-            <!-- The linebreaksbr filter ensures that newline characters (\n) in the content 
-                 are converted to proper HTML breaks (<br> and <p>) for formatting. -->
-            {{ post.content|linebreaksbr }}
-        </div>
+    <!-- Comment Section -->
+    <div class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ comments.count }} Comment{{ comments.count|pluralize }}</h2>
+        
+        <!-- Comment Form for Authenticated Users -->
+        {% if user.is_authenticated %}
+            <div class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Leave a Comment</h3>
+                <!-- The form POSTs back to the same PostDetailView URL -->
+                <form method="POST" action="{% url 'post-detail' pk=post.pk %}">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <button type="submit" class="mt-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        Post Comment
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <p class="mb-6 text-gray-600 p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r-lg">
+                Please <a href="{% url 'blog:login' %}" class="text-blue-600 hover:underline font-semibold">log in</a> to post a comment.
+            </p>
+        {% endif %}
 
-        <div class="back-link">
-            <a href="{% url 'posts' %}">&larr; Back to all posts</a>
-        </div>
-    </article>
-{% endblock %}
+        <!-- Comment List -->
+        {% for comment in comments %}
+            <div class="bg-white p-4 mb-4 rounded-lg shadow border border-gray-100">
+                <p class="text-sm font-semibold text-gray-700 mb-1">
+                    {{ comment.author.username }} 
+                    <span class="text-xs font-normal text-gray-500 ml-2">
+                        - {{ comment.created_at|date:"M d, Y, P" }}
+                        {% if comment.updated_at != comment.created_at %} (Edited) {% endif %}
+                    </span>
+                </p>
+                <p class="text-gray-800 leading-snug">{{ comment.content }}</p>
+                
+                <!-- Comment Edit/Delete Actions -->
+                {% if comment.author == user %}
+                    <div class="mt-2 text-xs space-x-3">
+                        <a href="{% url 'comment-update' pk=comment.pk %}" class="text-blue-500 hover:text-blue-700">Edit</a>
+                        <a href="{% url 'comment-delete' pk=comment.pk %}" class="text-red-500 hover:text-red-700">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p class="text-gray-500 p-4 bg-white rounded-lg border">No comments yet. Be the first to comment!</p>
+        {% endfor %}
+        
+    </div>
+</div>
+
+{% endblock content %}

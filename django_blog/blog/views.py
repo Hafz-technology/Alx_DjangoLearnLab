@@ -8,7 +8,12 @@ from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm, UserUpdateForm
 from .models import Post # Import the Post model
 
-# --- Placeholder View for Home ---
+from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
+from .models import Post, Comment 
+
+
+
+
 
 # Placeholder for the home page
 class HomeView(TemplateView):
@@ -120,4 +125,45 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, f'Post "{self.get_object().title}" deleted successfully.')
+        return super().delete(request, *args, **kwargs)
+
+
+
+
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Allows the comment author to update their comment."""
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+    context_object_name = 'comment'
+    
+    def form_valid(self, form):
+        """Adds a success message after a successful update."""
+        messages.success(self.request, 'Your comment has been updated successfully!')
+        return super().form_valid(form)
+        
+    def test_func(self):
+        """Ensures that only the author can update the comment."""
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Allows the comment author to delete their comment."""
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+    context_object_name = 'comment'
+    
+    def get_success_url(self):
+        """Redirects back to the post detail page after deletion."""
+        # Use the post's primary key associated with the comment
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
+        
+    def test_func(self):
+        """Ensures that only the author can delete the comment."""
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Comment deleted successfully.')
         return super().delete(request, *args, **kwargs)

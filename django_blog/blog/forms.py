@@ -1,9 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import Post # Import the Post model
+from .models import Post, Comment 
 
-# Get the custom user model, which defaults to django.contrib.auth.models.User
+
 User = get_user_model()
 
 # --- Authentication Forms ---
@@ -54,4 +54,31 @@ class PostForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Enter post title here'}),
             'content': forms.Textarea(attrs={'placeholder': 'Write your blog content...', 'rows': 15}),
+        }
+
+
+
+
+
+
+class CommentForm(forms.ModelForm):
+    """
+    A ModelForm for creating and updating Comment objects.
+    Only exposes the content field to the user.
+    """
+    class Meta:
+        model = Comment
+        # Only the content is input by the user. post and author are set in the view.
+        fields = ['content']
+        # Add widget to improve textarea appearance
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'placeholder': 'Add a comment...', 
+                'rows': 3,
+                'class': 'form-control' # Use Bootstrap class for styling
+            }),
+        }
+        # Explicitly set labels
+        labels = {
+            'content': 'Your Comment'
         }
