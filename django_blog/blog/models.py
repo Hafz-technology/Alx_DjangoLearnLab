@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 # Create your models here.
 
@@ -17,4 +18,44 @@ class Post(models.Model):
     class Meta:
         # Optional: Order posts by published_date in descending order (newest first)
         ordering = ['-published_date']
+
+class Comment(models.Model):
+    """
+    Model for storing comments associated with a Post.
+    """
+    post = models.ForeignKey(
+        Post, 
+        on_delete=models.CASCADE, 
+        related_name='comments',
+        verbose_name="Blog Post"
+    )
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='user_comments',
+        verbose_name="Comment Author"
+    )
+    content = models.TextField(
+        verbose_name="Comment Content"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        # Order comments by creation time (oldest first, so newest are at the bottom)
+        ordering = ['created_at']
+        verbose_name = "Comment"
+        verbose_name_plural = "Comments"
+
+    def __str__(self):
+        # Display the comment content truncated, and its author
+        return f'Comment by {self.author.username} on "{self.post.title}"'
+
+    def get_absolute_url(self):
+        # Redirects back to the post detail page after comment CRUD operations
+        return reverse('post-detail', kwargs={'pk': self.post.pk})
 
