@@ -1,17 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from django.views.generic import TemplateView
-from .forms import CustomUserCreationForm
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
-# Create your views here.
+from .forms import CustomUserCreationForm, UserUpdateForm
+from .models import Post # Import the Post model
 
-# --- Placeholder View for Home and Post List (Required for URL mapping) ---
-# Placeholder for the main blog list view
-def post_list(request):
-    """Placeholder view for the main blog post list."""
-    context = {'message': 'This is the main blog post list page.'}
-    return render(request, 'blog/post_list.html', context)
+# --- Placeholder View for Home ---
 
 # Placeholder for the home page
 class HomeView(TemplateView):
@@ -28,7 +25,7 @@ def register(request):
             user = form.save()
             messages.success(request, f'Account created for {user.username}! You can now log in.')
             # Redirect to the login page after successful registration
-            return redirect('login') 
+            return redirect('blog:login') 
         else:
             messages.error(request, 'Error during registration. Please check the fields.')
     else:
@@ -39,6 +36,88 @@ def register(request):
 
 @login_required
 def profile(request):
-    """A simple profile page, requiring login."""
-    context = {'title': 'User Profile'}
+    """Allows authenticated users to view and update their profile details (username and email)."""
+    # Import necessary modules inside the view to avoid circular dependency in earlier steps
+    from django.contrib.auth import update_session_auth_hash 
+
+    if request.method == 'POST':
+        # Populate the form with POST data and the current instance (request.user)
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            # Important: Keep the user logged in after username change
+            update_session_auth_hash(request, request.user) 
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('blog:profile') # Redirect back to the profile page to display success message
+        else:
+            messages.error(request, 'Error updating profile. Please check the form.')
+    else:
+        # For GET request, populate the form with existing user data
+        form = UserUpdateForm(instance=request.user)
+    
+    context = {
+        'form': form, 
+        'title': 'User Profile'
+    }
     return render(request, 'blog/profile.html', context)
+
+# --- Blog Post CRUD Views ---
+
+class PostListView(ListView):
+    """Displays a list of all blog posts."""
+    model = Post
+    template_name = 'blog/post_list.html'  # <app>/<model>_list.html
+    context_object_name = 'posts'
+    ordering = ['-published_date'] # Order by newest first
+
+class PostDetailView(DetailView):
+    """Displays a single blog post."""
+    model = Post
+    template_name = 'blog/post_detail.html' # <app>/<model>_detail.html
+    context_object_name = 'post'
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    """Allows logged-in users to create a new post."""
+    model = Post
+    template_name = 'blog/post_form.html'
+    # Only allow fields title and content to be edited via the form
+    fields = ['title', 'content'] 
+    
+    def form_valid(self, form):
+        """Sets the author of the post to the current logged-in user."""
+        form.instance.author = self.request.user
+        messages.success(self.request, 'Your post has been created successfully!')
+        return super().form_valid(form)
+        
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Allows the post author to update their post."""
+    model = Post
+    template_name = 'blog/post_form.html'
+    fields = ['title', 'content']
+    
+    def form_valid(self, form):
+        """Sets the author of the post to the current logged-in user (though it shouldn't change)."""
+        form.instance.author = self.request.user
+        messages.success(self.request, 'Your post has been updated successfully!')
+        return super().form_valid(form)
+        
+    def test_func(self):
+        """Ensures that only the author can update the post."""
+        post = self.get_object()
+        return self.request.user == post.author
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Allows the post author to delete their post."""
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('blog:posts') # Redirect to the post list after deletion
+    context_object_name = 'post'
+
+    def test_func(self):
+        """Ensures that only the author can delete the post."""
+        post = self.get_object()
+        return self.request.user == post.author
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, f'Post "{self.get_object().title}" deleted successfully.')
+        return super().delete(request, *args, **kwargs)

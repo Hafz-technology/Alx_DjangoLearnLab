@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if view.object %}
+        Edit Post: {{ view.object.title }}
+    {% else %}
+        Create New Post
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="form-container post-form-container">
+        <h1>
+            {% if view.object %}
+                Edit Post
+            {% else %}
+                Create New Post
+            {% endif %}
+        </h1>
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <span class="error-message">{{ field.errors }}</span>
+                    {% endif %}
+                </p>
+            {% endfor %}
+
+            <button type="submit" class="btn-primary">
+                {% if view.object %}
+                    Update Post
+                {% else %}
+                    Publish Post
+                {% endif %}
+            </button>
+        </form>
+    </div>
+{% endblock %}
