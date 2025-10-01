@@ -1,21 +1,32 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
     <article class="post-detail">
         <h1>{{ post.title }}</h1>
-        <p class="post-meta">By {{ post.author.username }} on {{ post.published_date|date:"F j, Y" }}</p>
-        <div class="post-content">
-            <p>{{ post.content|linebreaks }}</p>
+        <div class="post-meta">
+            Posted by <span class="author-name">{{ post.author.username }}</span> 
+            on {{ post.published_date|date:"F j, Y, P" }}
         </div>
         
-        <!-- Only show edit/delete buttons if the current user is the author -->
+        <!-- Action buttons visible only to the author (the currently logged-in user) -->
         {% if user.is_authenticated and user.id == post.author.id %}
             <div class="post-actions">
-                <a href="{% url 'post-create-update' pk=post.pk %}" class="btn-edit">Edit Post</a>
-                <a href="{% url 'post-delete' pk=post.pk %}" class="btn-delete">Delete Post</a>
+                <a href="{% url 'blog:post-update' pk=post.pk %}" class="btn-secondary">Edit Post</a>
+                <a href="{% url 'blog:post-delete' pk=post.pk %}" class="btn-danger">Delete Post</a>
             </div>
         {% endif %}
+
+        <div class="post-content">
+            <!-- The linebreaksbr filter ensures that newline characters (\n) in the content 
+                 are converted to proper HTML breaks (<br> and <p>) for formatting. -->
+            {{ post.content|linebreaksbr }}
+        </div>
+
+        <div class="back-link">
+            <a href="{% url 'blog:posts' %}">&larr; Back to all posts</a>
+        </div>
     </article>
 {% endblock %}

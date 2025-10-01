@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Post Confirmation{% endblock %}
+
+{% block content %}
+    <div class="form-container delete-confirmation">
+        <h1 class="text-danger">Confirm Deletion</h1>
+        <p>You are about to permanently delete the following post. This action cannot be undone.</p>
+        
+        <p class="post-to-delete">
+            Are you sure you want to delete the post titled: 
+            <strong>"{{ object.title }}"</strong>?
+        </p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger">Yes, Delete This Post</button>
+            <a href="{% url 'blog:post-detail' pk=object.pk %}" class="btn-secondary">No, Go Back</a>
+        </form>
+    </div>
+{% endblock %}
