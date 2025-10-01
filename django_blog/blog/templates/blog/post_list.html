@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}All Blog Posts{% endblock %}
+
+{% block content %}
+    <h1>Blog Posts</h1>
+    <p>This page will eventually list all published blog posts.</p>
+    
+    {% if user.is_authenticated %}
+        <p>You are logged in and ready to view or create content!</p>
+    {% else %}
+        <p>Viewing posts is public, but please log in to write one.</p>
+    {% endif %}
+{% endblock %}

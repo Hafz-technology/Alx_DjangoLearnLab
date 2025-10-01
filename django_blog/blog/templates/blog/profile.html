@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <h1>Welcome, {{ user.username }}!</h1>
+        <p>This is your personalized profile dashboard.</p>
+        
+        <h2>Account Details</h2>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F j, Y" }}</p>
+
+        <h2>Actions</h2>
+        <p>You can manage your account settings and view your posts here.</p>
+        <a href="{% url 'logout' %}" class="btn-logout">Log Out</a>
+    </div>
+{% endblock %}

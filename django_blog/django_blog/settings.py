@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'django_blog.urls'
@@ -151,3 +152,15 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- New Authentication Settings ---
+
+# URL to redirect to after a user logs in (default is /accounts/profile/)
+LOGIN_REDIRECT_URL = 'profile'
+
+# URL to redirect to after a user logs out (default is /accounts/logout/)
+LOGOUT_REDIRECT_URL = 'home'
+
+# URL to redirect to if a user tries to access a login_required view
+LOGIN_URL = 'login'
