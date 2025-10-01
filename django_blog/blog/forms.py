@@ -58,7 +58,7 @@ class PostForm(forms.ModelForm):
         }
 
 # --- Comment Form (New - Step 2) ---
-
+#  ["TagWidget()"]
 class CommentForm(forms.ModelForm):
     """A ModelForm for creating and updating Comment objects."""
     class Meta:
