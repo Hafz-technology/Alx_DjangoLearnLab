@@ -24,6 +24,7 @@ header nav ul {
 header nav ul li {
     display: inline;
     margin: 0 15px;
+  
 }
 
 header nav ul li a {
@@ -184,3 +185,5 @@ footer {
 .profile-container p {
     margin: 8px 0;
 }
+
+

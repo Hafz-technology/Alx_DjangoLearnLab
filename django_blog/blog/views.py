@@ -11,12 +11,12 @@ from .forms import CustomUserCreationForm
 def post_list(request):
     """Placeholder view for the main blog post list."""
     context = {'message': 'This is the main blog post list page.'}
-    return render(request, './templates/blog/post_list.html', context)
+    return render(request, 'blog/post_list.html', context)
 
 # Placeholder for the home page
 class HomeView(TemplateView):
     """Placeholder view for the home page."""
-    template_name = './templates/blog/home.html'
+    template_name = 'blog/home.html'
 
 # --- Authentication Views ---
 
@@ -35,10 +35,10 @@ def register(request):
         form = CustomUserCreationForm()
     
     context = {'form': form, 'title': 'Register'}
-    return render(request, './templates/blog/register.html', context)
+    return render(request, 'blog/register.html', context)
 
 @login_required
 def profile(request):
     """A simple profile page, requiring login."""
     context = {'title': 'User Profile'}
-    return render(request, './templates/blog/profile.html', context)
+    return render(request, 'blog/profile.html', context)
