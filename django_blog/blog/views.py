@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 from .forms import CustomUserCreationForm, UserUpdateForm
 from .models import Post # Import the Post model
@@ -128,6 +128,32 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    """Allows authenticated users to create a new comment on a specific post."""
+    model = Comment
+    form_class = CommentForm
+    # We don't need a separate template for the form, as it's embedded in post-detail.html
+    # But we set success_url later in form_valid
+    
+    def form_valid(self, form):
+        """Attaches the current post and the logged-in user to the comment before saving."""
+        
+        # 1. Get the Post object using the 'post_pk' from the URL
+        post = get_object_or_404(Post, pk=self.kwargs.get('post_pk'))
+        
+        # 2. Attach metadata to the form instance
+        form.instance.post = post
+        form.instance.author = self.request.user
+        
+        messages.success(self.request, 'Your comment has been posted successfully!')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirects back to the post detail page after successful comment creation."""
+        # Use the post's primary key from the URL kwargs
+        return reverse('blog:post-detail', kwargs={'pk': self.kwargs.get('post_pk')})
 
 
 
