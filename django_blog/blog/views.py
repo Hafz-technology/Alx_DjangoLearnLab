@@ -179,7 +179,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = 'blog/comment_confirm_delete.html'
     context_object_name = 'comment'
-    
+    # ["Post.objects.filter", "title__icontains", "tags__name__icontains", "content__icontains"]
     def get_success_url(self):
         """Redirects back to the post detail page after deletion."""
         # Use the post's primary key associated with the comment
