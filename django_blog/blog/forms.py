@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+# Import new models: Post and Comment
 from .models import Post, Comment 
 
-
+# Get the custom user model, which defaults to django.contrib.auth.models.User
 User = get_user_model()
 
-# --- Authentication Forms ---
+# --- Authentication Forms (Existing) ---
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -38,47 +39,33 @@ class UserUpdateForm(forms.ModelForm):
         # Only allow changing username and email
         fields = ['username', 'email']
 
-# --- Blog Post Form ---
+# --- Blog Post Form (Updated for Tags) ---
 
 class PostForm(forms.ModelForm):
     """
-    A ModelForm for creating and updating Post objects.
-    Only exposes title and content fields to the user.
+    A ModelForm for creating and updating Post objects, now including tags.
     """
     class Meta:
         model = Post
-        # These are the only fields the user interacts with directly.
-        fields = ['title', 'content'] 
+        # Add 'tags' field automatically managed by django-taggit
+        fields = ['title', 'content', 'tags'] 
         
-        # Optional: Add styling/widgets for better appearance
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Enter post title here'}),
-            'content': forms.Textarea(attrs={'placeholder': 'Write your blog content...', 'rows': 15}),
+            'title': forms.TextInput(attrs={'placeholder': 'Enter post title', 'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'placeholder': 'Write your content here', 'rows': 15, 'class': 'form-control'}),
+            # django-taggit uses a simple text input for tags
+            'tags': forms.TextInput(attrs={'placeholder': 'Enter tags separated by commas (e.g., python, django, tutorial)', 'class': 'form-control'})
         }
 
-
-
-
-
+# --- Comment Form (New - Step 2) ---
 
 class CommentForm(forms.ModelForm):
-    """
-    A ModelForm for creating and updating Comment objects.
-    Only exposes the content field to the user.
-    """
+    """A ModelForm for creating and updating Comment objects."""
     class Meta:
         model = Comment
-        # Only the content is input by the user. post and author are set in the view.
+        # Only the content field is exposed to the user
         fields = ['content']
-        # Add widget to improve textarea appearance
+        
         widgets = {
-            'content': forms.Textarea(attrs={
-                'placeholder': 'Add a comment...', 
-                'rows': 3,
-                'class': 'form-control' # Use Bootstrap class for styling
-            }),
-        }
-        # Explicitly set labels
-        labels = {
-            'content': 'Your Comment'
+            'content': forms.Textarea(attrs={'placeholder': 'Join the discussion...', 'rows': 3, 'class': 'form-control'})
         }
