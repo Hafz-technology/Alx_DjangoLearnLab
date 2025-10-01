@@ -66,7 +66,7 @@ def profile(request):
 class PostListView(ListView):
     """Displays a list of all blog posts."""
     model = Post
-    template_name = 'blog/post-list.html'  # <app>/<model>_list.html
+    template_name = 'blog/post_list.html'  # <app>/<model>_list.html
     context_object_name = 'posts'
     ordering = ['-published_date'] # Order by newest first
 
@@ -79,7 +79,7 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     """Allows logged-in users to create a new post."""
     model = Post
-    template_name = 'blog/post-form.html'
+    template_name = 'blog/post_form.html'
     # Only allow fields title and content to be edited via the form
     fields = ['title', 'content'] 
     
@@ -92,7 +92,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Allows the post author to update their post."""
     model = Post
-    template_name = 'blog/post-form.html'
+    template_name = 'blog/post_form.html'
     fields = ['title', 'content']
     
     def form_valid(self, form):
