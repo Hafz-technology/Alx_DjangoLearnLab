@@ -14,8 +14,8 @@
         <!-- Action buttons visible only to the author (the currently logged-in user) -->
         {% if user.is_authenticated and user.id == post.author.id %}
             <div class="post-actions">
-                <a href="{% url 'blog:post-update' pk=post.pk %}" class="btn-secondary">Edit Post</a>
-                <a href="{% url 'blog:post-delete' pk=post.pk %}" class="btn-danger">Delete Post</a>
+                <a href="{% url 'post-update' pk=post.pk %}" class="btn-secondary">Edit Post</a>
+                <a href="{% url 'post-delete' pk=post.pk %}" class="btn-danger">Delete Post</a>
             </div>
         {% endif %}
 
@@ -26,7 +26,7 @@
         </div>
 
         <div class="back-link">
-            <a href="{% url 'blog:posts' %}">&larr; Back to all posts</a>
+            <a href="{% url 'posts' %}">&larr; Back to all posts</a>
         </div>
     </article>
 {% endblock %}

@@ -25,7 +25,7 @@ def register(request):
             user = form.save()
             messages.success(request, f'Account created for {user.username}! You can now log in.')
             # Redirect to the login page after successful registration
-            return redirect('blog:login') 
+            return redirect('login') 
         else:
             messages.error(request, 'Error during registration. Please check the fields.')
     else:
@@ -48,7 +48,7 @@ def profile(request):
             # Important: Keep the user logged in after username change
             update_session_auth_hash(request, request.user) 
             messages.success(request, 'Your profile has been updated successfully!')
-            return redirect('blog:profile') # Redirect back to the profile page to display success message
+            return redirect('profile') # Redirect back to the profile page to display success message
         else:
             messages.error(request, 'Error updating profile. Please check the form.')
     else:
@@ -66,20 +66,20 @@ def profile(request):
 class PostListView(ListView):
     """Displays a list of all blog posts."""
     model = Post
-    template_name = 'blog/post_list.html'  # <app>/<model>_list.html
+    template_name = 'blog/post-list.html'  # <app>/<model>_list.html
     context_object_name = 'posts'
     ordering = ['-published_date'] # Order by newest first
 
 class PostDetailView(DetailView):
     """Displays a single blog post."""
     model = Post
-    template_name = 'blog/post_detail.html' # <app>/<model>_detail.html
+    template_name = 'blog/post-detail.html' # <app>/<model>_detail.html
     context_object_name = 'post'
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     """Allows logged-in users to create a new post."""
     model = Post
-    template_name = 'blog/post_form.html'
+    template_name = 'blog/post-form.html'
     # Only allow fields title and content to be edited via the form
     fields = ['title', 'content'] 
     
@@ -92,7 +92,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Allows the post author to update their post."""
     model = Post
-    template_name = 'blog/post_form.html'
+    template_name = 'blog/post-form.html'
     fields = ['title', 'content']
     
     def form_valid(self, form):
@@ -109,7 +109,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Allows the post author to delete their post."""
     model = Post
-    template_name = 'blog/post_confirm_delete.html'
+    template_name = 'blog/post-confirm-delete.html'
     success_url = reverse_lazy('blog:posts') # Redirect to the post list after deletion
     context_object_name = 'post'
 
