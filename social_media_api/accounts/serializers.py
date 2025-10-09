@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import User
+from rest_framework.authtoken.models import Token
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
