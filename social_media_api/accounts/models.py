@@ -11,8 +11,15 @@ class User(AbstractUser):
         related_name='following', 
         blank=True
     )
+    # following = models.ManyToManyField(
+    #     'self', 
+    #     related_name='followers', 
+    #     symmetrical=False, 
+    #     blank=True
+    # )
 
     
     def __str__(self):
         return self.username
+
 

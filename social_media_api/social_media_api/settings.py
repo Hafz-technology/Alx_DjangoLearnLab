@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'accounts',
     'posts',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -141,7 +142,9 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10, 
     'DEFAULT_FILTER_BACKENDS': [
         'rest_framework.filters.SearchFilter',
-    ]
+        
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
