@@ -59,4 +59,4 @@ class FollowUserView(APIView, generics.GenericAPIView):
         return Response({'status': f'Successfully unfollowed {user_to_unfollow.username}'}, status=status.HTTP_200_OK)
         
 
-
+# ["CustomUser.objects.all()"]
