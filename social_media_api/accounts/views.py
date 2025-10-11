@@ -7,8 +7,9 @@ from .serializers import UserRegistrationSerializer, UserProfileSerializer
 from .models import User
 from rest_framework.authtoken.models import Token 
 from rest_framework.views import APIView
-
 from django.shortcuts import get_object_or_404
+from notifications.models import Notification
+
 
 
 # Create your views here.
@@ -38,7 +39,7 @@ class CustomAuthToken(ObtainAuthToken):
         })
 
 
-class FollowUserView(APIView, generics.GenericAPIView):
+class FollowUserView(APIView):    # , generics.GenericAPIView
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk, format=None):
@@ -49,8 +50,15 @@ class FollowUserView(APIView, generics.GenericAPIView):
             return Response({'error': 'You cannot follow yourself.'}, status=status.HTTP_400_BAD_REQUEST)
 
         current_user.following.add(user_to_follow)
+        Notification.objects.create(
+            recipient=user_to_follow,
+            actor=current_user,
+            verb='started following you',
+            target=current_user # The target is the user who initiated the follow
+        )
+        
         return Response({'status': f'Successfully followed {user_to_follow.username}'}, status=status.HTTP_200_OK)
-
+    
     def delete(self, request, pk, format=None):
         user_to_unfollow = get_object_or_404(User, pk=pk)
         current_user = request.user
@@ -58,5 +66,3 @@ class FollowUserView(APIView, generics.GenericAPIView):
         current_user.following.remove(user_to_unfollow)
         return Response({'status': f'Successfully unfollowed {user_to_unfollow.username}'}, status=status.HTTP_200_OK)
         
-
-# ["CustomUser.objects.all()"]

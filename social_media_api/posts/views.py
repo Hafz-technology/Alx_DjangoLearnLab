@@ -1,8 +1,14 @@
 from rest_framework import viewsets, permissions, generics
-from rest_framework.filters import SearchFilter # Import SearchFilter
-from .models import Post, Comment
+from rest_framework.filters import SearchFilter 
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsOwnerOrReadOnly
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from notifications.models import Notification 
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -22,7 +28,16 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        comment = serializer.save(author=self.request.user)
+        # Create notification for the post author
+        if comment.post.author != self.request.user:
+            Notification.objects.create(
+                recipient=comment.post.author,
+                actor=self.request.user,
+                verb='commented on',
+                target=comment.post
+            )
+
 
 
 class FeedView(generics.ListAPIView):
@@ -47,3 +62,33 @@ class FeedView(generics.ListAPIView):
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
 
 
+class LikeToggleView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk, format=None):
+        post = get_object_or_404(Post, pk=pk)
+        user = request.user
+        if Like.objects.filter(user=user, post=post).exists():
+            return Response({'error': 'You have already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+        Like.objects.create(user=user, post=post)
+        if post.author != user:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=user,
+                verb='liked',
+                target=post
+            )
+            
+        return Response({'status': 'Post liked'}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, pk, format=None):
+        post = get_object_or_404(Post, pk=pk)
+        user = request.user
+        like = Like.objects.filter(user=user, post=post)
+        if like.exists():
+            like.delete()
+            return Response({'status': 'Post unliked'}, status=status.HTTP_204_NO_CONTENT)
+        
+        return Response({'error': 'You have not liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
