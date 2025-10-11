@@ -176,7 +176,7 @@ REST_FRAMEWORK = {
 
 
 
-
+# social_media_api/settings.py doesn't contain: ["PORT"]
 
 
 
