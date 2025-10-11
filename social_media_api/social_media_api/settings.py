@@ -172,7 +172,7 @@ REST_FRAMEWORK = {
 }
 
 
-
+# social_media_api/settings.py doesn't contain: ["SECURE_BROWSER_XSS_FILTER", "X_FRAME_OPTIONS", "SECURE_SSL_REDIRECT"]
 
 
 
