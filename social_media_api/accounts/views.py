@@ -7,6 +7,7 @@ from .serializers import UserRegistrationSerializer, UserProfileSerializer
 from .models import User
 from rest_framework.authtoken.models import Token 
 from rest_framework.views import APIView
+
 from django.shortcuts import get_object_or_404
 
 
@@ -37,7 +38,7 @@ class CustomAuthToken(ObtainAuthToken):
         })
 
 
-class FollowUserView(APIView):
+class FollowUserView(APIView, generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk, format=None):
