@@ -6,7 +6,6 @@ from rest_framework.settings import api_settings
 from .serializers import UserRegistrationSerializer, UserProfileSerializer
 from .models import User
 from rest_framework.authtoken.models import Token 
-
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
