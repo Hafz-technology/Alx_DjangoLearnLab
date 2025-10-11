@@ -92,3 +92,4 @@ class LikeToggleView(APIView):
         return Response({'error': 'You have not liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
     
     
+# posts/views.py doesn't contain: ["generics.get_object_or_404(Post, pk=pk)", "Like.objects.get_or_create(user=request.user, post=post)"]
